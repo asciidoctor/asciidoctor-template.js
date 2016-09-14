@@ -48,7 +48,7 @@ module Asciidoctor
         if (typeof window !== 'undefined') {
           var jade = jade || window.jade;
         } else if (typeof require !== 'undefined') {
-          var jade = jade || require('./jade.js') || require('jade');
+          var jade = jade || require('jade');
         } 
         var compiled = jade.compile(#{template}, {pretty: true});
         return compiled({ node: #{node} });
