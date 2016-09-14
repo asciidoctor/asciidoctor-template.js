@@ -1,0 +1,2 @@
+# Generic template backend for Asciidoctor.js
+Guillaume Grossetie <https://github.com/mogztter[@mogztter]>
