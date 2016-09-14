@@ -1,2 +1,30 @@
 # Generic template backend for Asciidoctor.js
 Guillaume Grossetie <https://github.com/mogztter[@mogztter]>
+
+## Usage
+
+In this example we are using the https://github.com/asciidoctor/asciidoctor-reveal.js[Reveal.js backend]:
+
+```
+npm install asciidoctor-reveal.js
+```
+
+```
+var asciidoctor = require('asciidoctor.js')();
+var Asciidoctor = asciidoctor.Asciidoctor();
+var Opal = asciidoctor.Opal;
+Opal.load('nodejs');
+Opal.load('pathname');
+require('asciidoctor-reveal.js');
+
+var options = Opal.hash({'safe': 'safe',
+                         'template_dir': 'node_modules/asciidoctor-reveal.js/dist/templates',
+                         'backend': 'revealjs'});
+
+var content = '= Title\n\n' +
+              '== Slide 1\n\n' +
+              'Content 1\n\n' +
+              '== Slide 2\n\n' +
+             'Content 2';
+var result = Asciidoctor.$convert(content, options);
+```

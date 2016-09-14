@@ -1,6 +1,6 @@
 {
-  "name": "asciidoctor.js-backend-template",
-  "version": "0.0.1",
+  "name": "asciidoctor-template.js",
+  "version": "1.5.5-2",
   "description": "Generic template backend for Asciidoctor.js ",
   "main": "dist/main.min.js",
   "engines": {
@@ -9,7 +9,6 @@
   "files": [
     "dist/main.js",
     "dist/main.min.js",
-    "dist/templates",
     "LICENSE",
     "README.adoc"
   ],
@@ -21,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mogztter/asciidoctor.js-backend-template.git"
+    "url": "https://github.com/mogztter/asciidoctor-template.js.git"
   },
   "keywords": [
     "asciidoc",
@@ -30,26 +29,25 @@
     "javascript",
     "library",
     "backend",
-    "template"
+    "template",
+    "jade"
   ],
   "authors": [
     "Guillaume Grossetie (https://github.com/mogztter)"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mogztter/asciidoctor.js-backend-template/issues"
+    "url": "https://github.com/mogztter/asciidoctor-template.js/issues"
   },
-  "homepage": "https://github.com/mogztter/asciidoctor.js-backend-template",
+  "homepage": "https://github.com/mogztter/asciidoctor-template.js",
   "dependencies": {
     "jade": "1.11.0",
-    "opal-runtime": "0.10.1-integration2",
-    "reveal.js": "3.3.0"
+    "asciidoctor.js": "1.5.5-2"
   },
   "devDependencies": {
     "async": "^1.5.0",
     "colors": "1.1.2",
     "cross-env": "^1.0.8",
-    "opal-compiler": "0.10.1-integration2",
-    "tar-fs": "1.11.1"
+    "opal-compiler": "0.10.1-integration2"
   }
 }

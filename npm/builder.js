@@ -7,9 +7,6 @@ var path = require('path');
 var https = require('https');
 var http = require('http');
 var os = require('os');
-var zlib = require('zlib');
-var tar = require('tar-fs');
-var concat = require('./concat.js');
 var Uglify = require('./uglify.js');
 var OpalCompiler = require('./opal-compiler.js');
 var Log = require('./log.js');
@@ -17,10 +14,6 @@ var uglify = new Uglify();
 var log = new Log();
 
 var stdout;
-
-String.prototype.endsWith = function(suffix) {
-  return this.indexOf(suffix, this.length - suffix.length) !== -1;
-};
 
 var deleteFolderRecursive = function(path) {
   var files = [];
@@ -83,18 +76,6 @@ var copyDir = function(src, dest) {
   }
 };
 
-var walk = function(currentDirPath, callback) {
-  fs.readdirSync(currentDirPath).forEach(function(name) {
-    var filePath = path.join(currentDirPath, name);
-    var stat = fs.statSync(filePath);
-    if (stat.isFile()) {
-      callback(filePath, stat);
-    } else if (stat.isDirectory()) {
-      walk(filePath, callback);
-    }
-  });
-};
-
 var javaVersionText = function() {
   var result = child_process.execSync('java -version 2>&1', {encoding: 'utf8'});
   var firstLine = result.split('\n')[0];
@@ -103,7 +84,6 @@ var javaVersionText = function() {
 };
 
 function Builder() {
-  this.templatesVersion = 'master';
 }
 
 Builder.prototype.build = function(callback) {
@@ -117,7 +97,6 @@ Builder.prototype.build = function(callback) {
 
   async.series([
     function(callback) { builder.clean(callback); }, // clean
-    function(callback) { builder.downloadDependencies(callback); }, // download dependencies
     function(callback) { builder.compile(callback); }, // compile
     function(callback) { builder.uglify(callback); } // uglify (optional)
   ], function() {
@@ -131,36 +110,6 @@ Builder.prototype.clean = function(callback) {
   this.deleteBuildFolder(); // delete build folder
   callback();
 };
-
-Builder.prototype.downloadDependencies = function(callback) {
-  log.title('download dependencies');
-
-  var builder = this;
-  async.series([
-    function(callback) { builder.getContentFromURL('https://codeload.github.com/asciidoctor/asciidoctor-reveal.js/tar.gz/' + builder.templatesVersion, 'build/templates-revealjs.tar.gz', callback); },
-    function(callback) { builder.untar('build/templates-revealjs.tar.gz', 'templates-revealjs', 'build', callback); }
-  ], function() {
-    typeof callback === 'function' && callback();
-  });
-}
-
-Builder.prototype.untar = function(source, baseDirName, destinationDir, callback) {
-  var stream = fs.createReadStream(source).pipe(zlib.createGunzip()).pipe(tar.extract(destinationDir, {
-    map: function (header) {
-      // REMIND Do NOT user path.sep!
-      // In this case, even on Windows, the separator is '/'.
-      var paths = header.name.split('/');
-      // replace base directory with 'baseDirName'
-      paths.shift();
-      paths.unshift(baseDirName);
-      header.name = paths.join('/');
-      return header;
-    }
-  }));
-  stream.on('finish', function () {
-    callback();
-  });
-}
 
 Builder.prototype.dist = function(releaseVersion) {
   var builder = this;
@@ -231,13 +180,8 @@ Builder.prototype.completeRelease = function(releaseVersion, callback) {
   console.log('');
   log.info('To complete the release, you need to:');
   log.info("[ ] push changes upstream: 'git push origin master && git push origin v" + releaseVersion + "'");
-  log.info("[ ] publish a release page on GitHub: https://github.com/mogztter/asciidoctor.js-backend-template/releases/new");
+  log.info("[ ] publish a release page on GitHub: https://github.com/mogztter/asciidoctor-template.js/releases/new");
   callback();
-};
-
-Builder.prototype.concat = function(message, files, destination) {
-  log.debug(message);
-  concat(files, destination);
 };
 
 Builder.prototype.deleteBuildFolder = function() {
@@ -311,13 +255,7 @@ Builder.prototype.copyToDist = function(callback) {
   builder.deleteDistFolder();
   builder.copy('build/asciidoctor-backend-template.js', 'dist/main.js');
   builder.copy('build/asciidoctor-backend-template.min.js', 'dist/main.min.js');
-  copyDir('build/templates-revealjs/templates/jade', 'dist/templates/revealjs');
   typeof callback === 'function' && callback();
-};
-
-Builder.prototype.copyToDir = function(from, toDir) {
-  var basename = path.basename(from);
-  this.copy(from, toDir + '/' + basename);
 };
 
 Builder.prototype.copy = function(from, to) {
@@ -332,24 +270,6 @@ Builder.prototype.mkdirSync = function(path) {
   }
 };
 
-Builder.prototype.getContentFromURL = function(source, target, callback) {
-  log.transform('get', source, target);
-  var targetStream = fs.createWriteStream(target);
-  var downloadModule;
-  // startWith alternative
-  if (source.lastIndexOf('https', 0) === 0) {
-    downloadModule = https;
-  } else {
-    downloadModule = http;
-  }
-  downloadModule.get(source, function(response) {
-    response.pipe(targetStream);
-    targetStream.on('finish', function () {
-      targetStream.close(callback);
-    });
-  });
-};
-
 Builder.prototype.compile = function(callback) {
   var builder = this;
 
@@ -357,9 +277,7 @@ Builder.prototype.compile = function(callback) {
 
   this.mkdirSync('build');
 
-  log.title('compile backends lib');
-//  opalCompiler.compile('asciidoctor/core_ext/factory', 'build/asciidoctor-factory.js');
-//  opalCompiler.compile('asciidoctor/core_ext/template', 'build/asciidoctor-template.js');
+  log.title('compile template backend');
   opalCompiler.compile('asciidoctor/core_ext', 'build/asciidoctor-backend-template.js');
 
   callback();
