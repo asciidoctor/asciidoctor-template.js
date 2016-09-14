@@ -6,19 +6,22 @@ Guillaume Grossetie <https://github.com/mogztter[@mogztter]>
 In this example we are using the https://github.com/asciidoctor/asciidoctor-reveal.js[Reveal.js backend]:
 
 ```
+npm install asciidoctor.js
 npm install asciidoctor-reveal.js
 ```
 
-```
+IMPORTANT: `asciidoctor-reveal.js` and `asciidoctor-template.js` are not yet available on npmjs.com
+
+```javascript
 var asciidoctor = require('asciidoctor.js')();
 var Asciidoctor = asciidoctor.Asciidoctor();
 var Opal = asciidoctor.Opal;
 Opal.load('nodejs');
 Opal.load('pathname');
-require('asciidoctor-reveal.js');
+require('asciidoctor-template.js');
 
 var options = Opal.hash({'safe': 'safe',
-                         'template_dir': 'node_modules/asciidoctor-reveal.js/dist/templates',
+                         'template_dir': 'node_modules/asciidoctor-reveal.js/templates',
                          'backend': 'revealjs'});
 
 var content = '= Title\n\n' +
