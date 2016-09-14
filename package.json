@@ -8,6 +8,8 @@
   },
   "files": [
     "dist/main.js",
+    "dist/main.min.js",
+    "dist/templates",
     "LICENSE",
     "README.adoc"
   ],

@@ -311,7 +311,7 @@ Builder.prototype.copyToDist = function(callback) {
   builder.deleteDistFolder();
   builder.copy('build/asciidoctor-backend-template.js', 'dist/main.js');
   builder.copy('build/asciidoctor-backend-template.min.js', 'dist/main.min.js');
-  copyDir('build/templates-revealjs/templates/jade', 'dist/templates');
+  copyDir('build/templates-revealjs/templates/jade', 'dist/templates/revealjs');
   typeof callback === 'function' && callback();
 };
 
