@@ -35,6 +35,12 @@ module Asciidoctor
           ManPageConverter.new backend, opts
         end
 
+        if backend == 'revealjs' && (JAVASCRIPT_PLATFORM == 'node' || JAVASCRIPT_PLATFORM == 'node-electron')
+          if ::File.exist?(revealjs_templates_path = 'node_modules/asciidoctor-reveal.js/templates')
+            opts[:template_dirs] = revealjs_templates_path unless opts.key? :template_dirs
+          end
+        end
+
         return base_converter unless opts.key? :template_dirs
     
         unless defined? ::Asciidoctor::Converter::TemplateConverter
