@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mogztter/asciidoctor-template.js.git"
+    "url": "https://github.com/asciidoctor/asciidoctor-template.js.git"
   },
   "keywords": [
     "asciidoc",
@@ -37,9 +37,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mogztter/asciidoctor-template.js/issues"
+    "url": "https://github.com/asciidoctor/asciidoctor-template.js/issues"
   },
-  "homepage": "https://github.com/mogztter/asciidoctor-template.js",
+  "homepage": "https://github.com/asciidoctor/asciidoctor-template.js",
   "dependencies": {
     "jade": "1.11.0",
     "asciidoctor.js": "1.5.5-2"
