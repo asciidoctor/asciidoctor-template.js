@@ -46,6 +46,8 @@
   },
   "devDependencies": {
     "async": "^1.5.0",
+    "bestikk-log": "^0.1.0",
+    "bestikk-uglify": "^0.1.1",
     "colors": "1.1.2",
     "cross-env": "^1.0.8",
     "opal-compiler": "0.10.1-integration2"
