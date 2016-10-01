@@ -4,6 +4,11 @@ Guillaume Grossetie <https://github.com/mogztter[@mogztter]>
 :uri-jade-repo: https://github.com/pugjs/pug/tree/1.11.0
 :uri-repo: https://github.com/asciidoctor/asciidoctor-template.js
 
+ifdef::env-github[]
+image:http://img.shields.io/travis/asciidoctor/asciidoctor-template.js.svg[Travis build status, link=https://travis-ci.org/asciidoctor/asciidoctor-template.js]
+image:http://img.shields.io/npm/v/asciidoctor-template.js.svg[npm version, link=https://www.npmjs.org/package/asciidoctor-template.js]
+endif::[]
+
 ## Usage
 
 The {uri-repo}[`asciidoctor-template.js`] is a template backend for {uri-asciidoctorjs-repo}[Asciidoctor.js] based on {uri-jade-repo}[Jade] template engine.

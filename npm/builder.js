@@ -7,11 +7,8 @@ var path = require('path');
 var https = require('https');
 var http = require('http');
 var os = require('os');
-var Uglify = require('./uglify.js');
 var OpalCompiler = require('./opal-compiler.js');
-var Log = require('./log.js');
-var uglify = new Uglify();
-var log = new Log();
+var log = require('bestikk-log');
 
 var stdout;
 
@@ -29,58 +26,6 @@ var deleteFolderRecursive = function(path) {
     });
     fs.rmdirSync(path);
   }
-};
-
-// https://github.com/jprichardson/node-fs-extra/blob/master/lib/mkdirs/mkdirs-sync.js
-var mkdirsSync = function(p, made) {
-  p = path.resolve(p);
-  try {
-    fs.mkdirSync(p);
-    made = made || p;
-  } catch (err0) {
-    switch (err0.code) {
-      case 'ENOENT' :
-        made = mkdirsSync(path.dirname(p), made);
-        mkdirsSync(p, made);
-        break;
-
-      // In the case of any other error, just see if there's a dir
-      // there already.  If so, then hooray!  If not, then something
-      // is borked.
-      default:
-        var stat;
-        try {
-          stat = fs.statSync(p);
-        } catch (err1) {
-          throw err0;
-        }
-        if (!stat.isDirectory()) throw err0;
-        break;
-    }
-  }
-  return made;
-}
-
-var copyDir = function(src, dest) {
-  var exists = fs.existsSync(src);
-  var stats = exists && fs.statSync(src);
-  var isDirectory = exists && stats.isDirectory();
-  if (exists && isDirectory) {
-    fs.readdirSync(src).forEach(function(childItemName) {
-      copyDir(path.join(src, childItemName), path.join(dest, childItemName));
-    });
-  } else {
-    mkdirsSync(path.dirname(dest));
-    var data = fs.readFileSync(src);
-    fs.writeFileSync(dest, data);
-  }
-};
-
-var javaVersionText = function() {
-  var result = child_process.execSync('java -version 2>&1', {encoding: 'utf8'});
-  var firstLine = result.split('\n')[0];
-  var javaVersion = firstLine.match(/"(.*?)"/i)[1];
-  return javaVersion.replace(/\./g, '').replace(/_/g, '');
 };
 
 function Builder() {
@@ -106,7 +51,7 @@ Builder.prototype.build = function(callback) {
 };
 
 Builder.prototype.clean = function(callback) {
-  log.title('clean');
+  log.task('clean');
   this.deleteBuildFolder(); // delete build folder
   callback();
 };
@@ -141,14 +86,13 @@ Builder.prototype.release = function(releaseVersion) {
 };
 
 Builder.prototype.prepareRelease = function(releaseVersion, callback) {
-  log.title('Release version: ' + releaseVersion);
+  log.task('Release version: ' + releaseVersion);
 
   if (process.env.DRY_RUN) {
     log.warn('Dry run! To perform the release, run the command again without DRY_RUN environment variable');
   }
 
   this.replaceFileSync('package.json', /"version": "(.*?)"/g, '"version": "' + releaseVersion + '"');
-  this.replaceFileSync('bower.json', /"version": "(.*?)"/g, '"version": "' + releaseVersion + '"');
   callback();
 };
 
@@ -180,7 +124,7 @@ Builder.prototype.completeRelease = function(releaseVersion, callback) {
   console.log('');
   log.info('To complete the release, you need to:');
   log.info("[ ] push changes upstream: 'git push origin master && git push origin v" + releaseVersion + "'");
-  log.info("[ ] publish a release page on GitHub: https://github.com/mogztter/asciidoctor-template.js/releases/new");
+  log.info("[ ] publish a release page on GitHub: https://github.com/asciidoctor/asciidoctor-template.js/releases/new");
   callback();
 };
 
@@ -221,19 +165,8 @@ Builder.prototype.uglify = function(callback) {
     callback();
     return;
   }
-  // - Java7 or higher is available in PATH
-  try {
-    if (javaVersionText() < '170') {
-      log.warn('Closure Compiler requires Java7 or higher, skipping "minify" task');
-      callback();
-      return;
-    }
-  } catch (e) {
-    log.warn('\'java\' binary is not available in PATH, skipping "minify" task');
-    callback();
-    return;
-  }
-  log.title('uglify');
+  var uglify = require('bestikk-uglify');
+  log.task('uglify');
   var files = [
     {source: 'build/asciidoctor-backend-template.js', destination: 'build/asciidoctor-backend-template.min.js' }
   ];
@@ -251,7 +184,7 @@ Builder.prototype.uglify = function(callback) {
 Builder.prototype.copyToDist = function(callback) {
   var builder = this;
 
-  log.title('copy to dist/');
+  log.task('copy to dist/');
   builder.deleteDistFolder();
   builder.copy('build/asciidoctor-backend-template.js', 'dist/main.js');
   builder.copy('build/asciidoctor-backend-template.min.js', 'dist/main.min.js');
@@ -277,7 +210,7 @@ Builder.prototype.compile = function(callback) {
 
   this.mkdirSync('build');
 
-  log.title('compile template backend');
+  log.task('compile template backend');
   opalCompiler.compile('asciidoctor/core_ext', 'build/asciidoctor-backend-template.js');
 
   callback();
