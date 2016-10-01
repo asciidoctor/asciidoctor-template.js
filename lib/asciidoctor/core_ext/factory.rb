@@ -49,7 +49,8 @@ module Asciidoctor
         unless defined? ::Asciidoctor::Converter::CompositeConverter
           require 'asciidoctor/converter/composite'.to_s
         end
-        TemplateConverter.new backend, opts[:template_dirs], opts
+        template_converter = TemplateConverter.new backend, opts[:template_dirs], opts
+        CompositeConverter.new backend, template_converter, base_converter
       end
     end
   end

@@ -11,6 +11,10 @@ module Asciidoctor
       end
     end
 
+    def handles? name
+      !(resolve_template name).nil?
+    end
+
     def resolve_template name
       path_resolver = PathResolver.new
       backend = @backend
