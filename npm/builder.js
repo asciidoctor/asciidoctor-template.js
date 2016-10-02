@@ -9,24 +9,9 @@ var http = require('http');
 var os = require('os');
 var OpalCompiler = require('./opal-compiler.js');
 var log = require('bestikk-log');
+var bfs = require('bestikk-fs');
 
 var stdout;
-
-var deleteFolderRecursive = function(path) {
-  var files = [];
-  if (fs.existsSync(path)) {
-    files = fs.readdirSync(path);
-    files.forEach(function(file){
-      var curPath = path + "/" + file;
-      if (fs.lstatSync(curPath).isDirectory()) { // recurse
-        deleteFolderRecursive(curPath);
-      } else { // delete file
-        fs.unlinkSync(curPath);
-      }
-    });
-    fs.rmdirSync(path);
-  }
-};
 
 function Builder() {
 }
@@ -52,7 +37,7 @@ Builder.prototype.build = function(callback) {
 
 Builder.prototype.clean = function(callback) {
   log.task('clean');
-  this.deleteBuildFolder(); // delete build folder
+  this.removeBuildDirSync(); // remove build directory
   callback();
 };
 
@@ -104,7 +89,7 @@ Builder.prototype.commit = function(releaseVersion, callback) {
 };
 
 Builder.prototype.prepareNextIteration = function(callback) {
-  this.deleteDistFolder();
+  this.removeDistDirSync();
   this.execSync('git add -A .');
   this.execSync('git commit -m "Prepare for next development iteration"');
   callback();
@@ -128,25 +113,16 @@ Builder.prototype.completeRelease = function(releaseVersion, callback) {
   callback();
 };
 
-Builder.prototype.deleteBuildFolder = function() {
-  log.debug('delete build directory');
-  deleteFolderRecursive('build');
-  fs.mkdirSync('build');
+Builder.prototype.removeBuildDirSync = function() {
+  log.debug('remove build directory');
+  bfs.removeSync('build');
+  bfs.mkdirsSync('build');
 };
 
-Builder.prototype.deleteDistFolder = function() {
-  log.debug('delete dist directory');
-  deleteFolderRecursive('dist');
-  fs.mkdirSync('dist');
-};
-
-Builder.prototype.replaceFileSync = function(file, regexp, newSubString) {
-  log.debug('update ' + file);
-  if (!process.env.DRY_RUN) {
-    var data = fs.readFileSync(file, 'utf8');
-    var dataUpdated = data.replace(regexp, newSubString);
-    fs.writeFileSync(file, dataUpdated, 'utf8');
-  }
+Builder.prototype.removeDistDirSync = function() {
+  log.debug('remove dist directory');
+  bfs.removeSync('dist');
+  bfs.mkdirsSync('dist');
 };
 
 Builder.prototype.execSync = function(command) {
@@ -185,22 +161,10 @@ Builder.prototype.copyToDist = function(callback) {
   var builder = this;
 
   log.task('copy to dist/');
-  builder.deleteDistFolder();
-  builder.copy('build/asciidoctor-backend-template.js', 'dist/main.js');
-  builder.copy('build/asciidoctor-backend-template.min.js', 'dist/main.min.js');
+  builder.removeDistDirSync();
+  bfs.copySync('build/asciidoctor-backend-template.js', 'dist/main.js');
+  bfs.copySync('build/asciidoctor-backend-template.min.js', 'dist/main.min.js');
   typeof callback === 'function' && callback();
-};
-
-Builder.prototype.copy = function(from, to) {
-  log.transform('copy', from, to);
-  var data = fs.readFileSync(from);
-  fs.writeFileSync(to, data);
-};
-
-Builder.prototype.mkdirSync = function(path) {
-  if (!fs.existsSync(path)) {
-    fs.mkdirSync(path);
-  }
 };
 
 Builder.prototype.compile = function(callback) {
@@ -208,7 +172,7 @@ Builder.prototype.compile = function(callback) {
 
   var opalCompiler = new OpalCompiler({dynamicRequireLevel: 'ignore'});
 
-  this.mkdirSync('build');
+  bfs.mkdirsSync('build');
 
   log.task('compile template backend');
   opalCompiler.compile('asciidoctor/core_ext', 'build/asciidoctor-backend-template.js');
