@@ -75,9 +75,9 @@ Builder.prototype.prepareRelease = function(releaseVersion, callback) {
 
   if (process.env.DRY_RUN) {
     log.warn('Dry run! To perform the release, run the command again without DRY_RUN environment variable');
+  } else {
+    bfs.updateFileSync('package.json', /"version": "(.*?)"/g, '"version": "' + releaseVersion + '"');
   }
-
-  this.replaceFileSync('package.json', /"version": "(.*?)"/g, '"version": "' + releaseVersion + '"');
   callback();
 };
 
