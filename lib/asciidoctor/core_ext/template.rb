@@ -16,26 +16,33 @@ module Asciidoctor
       backend = @backend
       engine = @engine
       @template_dirs.each do |template_dir|
-        # FIXME need to think about safe mode restrictions here
-        next unless ::File.directory?(template_dir = (path_resolver.system_path template_dir, nil))
-
-        # NOTE last matching template wins for template name if no engine is given
+        # REMIND: All templates must be directly available in "template_dir"
+        # TODO: Remove the following block of code once the Reveal.js backend template complies with this new convention
+        # -- start
         if engine
-          # example: templates/haml
-          if ::File.directory?(engine_dir = (::File.join template_dir, engine))
-            template_dir = engine_dir
+          # example: templates/jade
+          engine_dir = (::File.join template_dir, engine)
+          template = ::File.join(engine_dir, name + "." + engine)
+          if (content = try_read template)
+            return content
           end
         end
-
-        # example: templates/html5 or templates/haml/html5
-        if ::File.directory?(backend_dir = (::File.join template_dir, backend))
-          template_dir = backend_dir
-        end
-
+        # -- end
+        
+        # example: templates
         template = ::File.join(template_dir, name + "." + engine)
-        return ::File.read(template) if ::File.exist?(template);
+        if (content = try_read template)
+          return content
+        end
       end
       return nil
+    end
+
+    def try_read name
+      ::File.read(name)
+    rescue IOError
+      # Ignore error as Asciidoctor expect a nil value if the template is not found
+      nil
     end
 
     def convert node, template_name = nil, opts = {}
