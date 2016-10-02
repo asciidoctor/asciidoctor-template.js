@@ -1,6 +1,6 @@
 {
   "name": "asciidoctor-template.js",
-  "version": "1.5.5-2",
+  "version": "1.5.5-3",
   "description": "Generic template backend for Asciidoctor.js ",
   "main": "dist/main.min.js",
   "engines": {
