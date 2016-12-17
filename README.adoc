@@ -29,20 +29,14 @@ npm install asciidoctor-reveal.js
 
 ```javascript
 var asciidoctor = require('asciidoctor.js')();
-var Asciidoctor = asciidoctor.Asciidoctor();
-var Opal = asciidoctor.Opal;
-Opal.load('nodejs');
-Opal.load('pathname');
+
 require('asciidoctor-template.js');
 
-var options = Opal.hash({'safe': 'safe',
-                         'template_dir': 'node_modules/asciidoctor-reveal.js/templates',
-                         'backend': 'revealjs'});
-
+var options = {safe: 'safe', backend: 'revealjs'};
 var content = '= Title\n\n' +
               '== Slide 1\n\n' +
               'Content 1\n\n' +
               '== Slide 2\n\n' +
              'Content 2';
-var result = Asciidoctor.$convert(content, options);
+var result = asciidoctor.convert(content, options);
 ```
