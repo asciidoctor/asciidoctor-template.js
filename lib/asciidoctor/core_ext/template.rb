@@ -12,7 +12,8 @@ module Asciidoctor
     end
 
     def handles? name
-      !(resolve_template name).nil?
+      template, content = resolve_template(name)
+      !template.nil?
     end
 
     def resolve_template name
@@ -28,7 +29,7 @@ module Asciidoctor
           engine_dir = (::File.join template_dir, engine)
           template = ::File.join(engine_dir, name + "." + engine)
           if (content = try_read template)
-            return content
+            return template, content
           end
         end
         # -- end
@@ -36,10 +37,10 @@ module Asciidoctor
         # example: templates
         template = ::File.join(template_dir, name + "." + engine)
         if (content = try_read template)
-          return content
+          return template, content
         end
       end
-      return nil
+      return nil, nil
     end
 
     def try_read name
@@ -51,7 +52,8 @@ module Asciidoctor
 
     def convert node, template_name = nil, opts = {}
       template_name ||= node.node_name
-      unless (template = resolve_template template_name)
+      template, content = resolve_template(template_name)
+      unless content
         raise %(Could not find a custom template to handle transform: #{template_name})
       end
 
@@ -61,7 +63,7 @@ module Asciidoctor
         } else if (typeof require !== 'undefined') {
           var jade = jade || require('jade');
         } 
-        var compiled = jade.compile(#{template}, {pretty: true});
+        var compiled = jade.compile(#{content}, {pretty: true, filename: #{template}});
         return compiled({ node: #{node} });
       )
     end
