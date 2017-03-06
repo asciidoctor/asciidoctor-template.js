@@ -4,7 +4,7 @@
   "description": "Generic template backend for Asciidoctor.js ",
   "main": "dist/main.min.js",
   "engines": {
-    "node": ">=0.12"
+    "node": ">=4"
   },
   "files": [
     "dist/main.js",
