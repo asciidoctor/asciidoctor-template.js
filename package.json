@@ -4,7 +4,8 @@
   "description": "Generic template backend for Asciidoctor.js ",
   "main": "dist/main.min.js",
   "engines": {
-    "node": ">=0.12"
+    "node": ">=4",
+    "npm": ">=3.0.0"
   },
   "files": [
     "dist/main.js",
@@ -13,7 +14,8 @@
     "README.adoc"
   ],
   "scripts": {
-    "build": "node npm/build.js",
+    "test": "mocha",
+    "build": "node npm/build.js && npm run test",
     "dist": "cross-env MINIFY=1 node npm/dist.js",
     "package": "cross-env MINIFY=1 node npm/build.js",
     "release": "cross-env MINIFY=1 node npm/release.js"
@@ -41,16 +43,18 @@
   },
   "homepage": "https://github.com/asciidoctor/asciidoctor-template.js",
   "dependencies": {
-    "jade": "1.11.0",
-    "asciidoctor.js": "1.5.5-4"
+    "jade": "1.11.0"
   },
   "devDependencies": {
-    "async": "^1.5.0",
-    "bestikk-fs": "^0.1.0",
-    "bestikk-log": "^0.1.0",
-    "bestikk-uglify": "^0.1.1",
+    "async": "1.5.2",
+    "asciidoctor.js": "1.5.6-preview.3",
+    "asciidoctor-reveal.js": "1.0.2",
+    "bestikk-fs": "0.1.0",
+    "bestikk-log": "0.1.0",
+    "bestikk-uglify": "0.1.1",
     "colors": "1.1.2",
-    "cross-env": "^1.0.8",
-    "opal-compiler": "0.10.1-integration2"
+    "cross-env": "1.0.8",
+    "mocha": "3.5.0",
+    "opal-compiler": "0.11.0-integration8"
   }
 }
