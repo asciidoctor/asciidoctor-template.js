@@ -28,6 +28,7 @@ Builder.prototype.build = function(callback) {
   async.series([
     function(callback) { builder.clean(callback); }, // clean
     function(callback) { builder.compile(callback); }, // compile
+    function(callback) { builder.generateUMD(callback); }, // UMD
     function(callback) { builder.uglify(callback); } // uglify (optional)
   ], function() {
     log.success('Done in ' + process.hrtime(start)[0] + 's');
@@ -61,13 +62,37 @@ Builder.prototype.release = function(releaseVersion) {
     function(callback) { builder.prepareRelease(releaseVersion, callback); },
     function(callback) { builder.build(callback); },
     function(callback) { builder.copyToDist(callback); },
-    function(callback) { builder.commit(releaseVersion, callback); },
     function(callback) { builder.publish(callback); },
-    function(callback) { builder.prepareNextIteration(callback); },
     function(callback) { builder.completeRelease(releaseVersion, callback); }
   ], function() {
     log.success('Done in ' + process.hrtime(start)[0] + 's');
   });
+};
+
+const parseTemplate = function (templateFile, templateModel) {
+  return fs.readFileSync(templateFile, 'utf8')
+    .replace(/\r\n/g, '\n')
+    .split('\n')
+    .map(line => {
+      if(line in templateModel){
+        return templateModel[line];
+      } else {
+        return line;
+      }
+    })
+    .join('\n');
+};
+
+Builder.prototype.generateUMD = function (callback) {
+  log.task('generate UMD');
+
+  const templateModel = {
+    '//#{asciidoctorTemplateCode}': fs.readFileSync('build/asciidoctor-backend-template.js', 'utf8')
+  };
+
+  const content = parseTemplate('src/template-asciidoctor-template.js', templateModel);
+  fs.writeFileSync('build/asciidoctor-template.js', content, 'utf8');
+  callback();
 };
 
 Builder.prototype.prepareRelease = function(releaseVersion, callback) {
@@ -76,22 +101,8 @@ Builder.prototype.prepareRelease = function(releaseVersion, callback) {
   if (process.env.DRY_RUN) {
     log.warn('Dry run! To perform the release, run the command again without DRY_RUN environment variable');
   } else {
-    bfs.updateFileSync('package.json', /"version": "(.*?)"/g, '"version": "' + releaseVersion + '"');
+    this.execSync(`npm version ${releaseVersion}`);
   }
-  callback();
-};
-
-Builder.prototype.commit = function(releaseVersion, callback) {
-  this.execSync('git add -A .');
-  this.execSync('git commit -m "Release ' + releaseVersion + '"');
-  this.execSync('git tag v' + releaseVersion);
-  callback();
-};
-
-Builder.prototype.prepareNextIteration = function(callback) {
-  this.removeDistDirSync();
-  this.execSync('git add -A .');
-  this.execSync('git commit -m "Prepare for next development iteration"');
   callback();
 };
 
@@ -144,7 +155,7 @@ Builder.prototype.uglify = function(callback) {
   var uglify = require('bestikk-uglify');
   log.task('uglify');
   var files = [
-    {source: 'build/asciidoctor-backend-template.js', destination: 'build/asciidoctor-backend-template.min.js' }
+    {source: 'build/asciidoctor-template.js', destination: 'build/asciidoctor-template.min.js' }
   ];
 
   var tasks = [];
@@ -162,8 +173,8 @@ Builder.prototype.copyToDist = function(callback) {
 
   log.task('copy to dist/');
   builder.removeDistDirSync();
-  bfs.copySync('build/asciidoctor-backend-template.js', 'dist/main.js');
-  bfs.copySync('build/asciidoctor-backend-template.min.js', 'dist/main.min.js');
+  bfs.copySync('build/asciidoctor-template.js', 'dist/main.js');
+  bfs.copySync('build/asciidoctor-template.min.js', 'dist/main.min.js');
   typeof callback === 'function' && callback();
 };
 
