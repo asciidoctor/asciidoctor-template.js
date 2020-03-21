@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "async": "1.5.2",
-    "asciidoctor.js": "1.5.6-preview.3",
+    "asciidoctor.js": "1.5.9",
     "asciidoctor-reveal.js": "1.0.2",
     "bestikk-fs": "0.1.0",
     "bestikk-log": "0.1.0",
