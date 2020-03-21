@@ -49,7 +49,7 @@
     "async": "1.5.2",
     "asciidoctor.js": "1.5.6-preview.3",
     "asciidoctor-reveal.js": "1.0.2",
-    "bestikk-fs": "0.1.0",
+    "bestikk-fs": "1.0.0",
     "bestikk-log": "0.1.0",
     "bestikk-uglify": "0.1.1",
     "colors": "1.1.2",
