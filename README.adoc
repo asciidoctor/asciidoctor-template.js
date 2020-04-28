@@ -1,45 +1,10 @@
 # Generic template backend for Asciidoctor.js
-Guillaume Grossetie <https://github.com/mogztter[@mogztter]>
-:uri-asciidoctorjs-repo: https://github.com/asciidoctor/asciidoctor.js
-:uri-jade-repo: https://github.com/pugjs/pug/tree/1.11.0
-:uri-repo: https://github.com/asciidoctor/asciidoctor-template.js
+:warning-caption: ⛔️
 
-ifdef::env-github[]
-image:http://img.shields.io/travis/asciidoctor/asciidoctor-template.js.svg[Travis build status, link=https://travis-ci.org/asciidoctor/asciidoctor-template.js]
-image:http://img.shields.io/npm/v/asciidoctor-template.js.svg[npm version, link=https://www.npmjs.org/package/asciidoctor-template.js]
-endif::[]
+image:http://unmaintained.tech/badge.svg[]
 
-## Usage
-
-The {uri-repo}[`asciidoctor-template.js`] is a template backend for {uri-asciidoctorjs-repo}[Asciidoctor.js] based on {uri-jade-repo}[Jade] template engine.
-
-Here’s the list of currently supported backends:
-
-* <<revealjs>>
-
-[[revealjs]]
-### Reveal.js
-
-In this example we are using the https://github.com/asciidoctor/asciidoctor-reveal.js[Reveal.js backend]:
-
-
-```
-npm install asciidoctor.js
-npm install asciidoctor-template.js
-npm install asciidoctor-reveal.js
-```
-
-```javascript
-var asciidoctor = require('asciidoctor.js')();
-
-require('asciidoctor-template.js')();
-
-const options = {safe: 'safe', backend: 'revealjs'};
-const content = `= Title\n\n\
-== Slide 1\n\n\
-Content 1\n\n\
-== Slide 2\n\n\
-Content 2`;
-const result = asciidoctor.convert(content, options);
-console.log(result);
-```
+[WARNING]
+====
+This project is **deprecated**. +
+https://github.com/asciidoctor/asciidoctor.js/releases/tag/v2.2.0[Asciidoctor.js 2.2.0] now provides a built-in template converter. +
+====
